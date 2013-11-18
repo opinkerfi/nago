@@ -12,9 +12,6 @@ c = config()
 c.parse_maincfg()
 check_result_path = c.get_cfg_value("check_result_path")
 
-user = 'nagios'
-(uid, gid) = pwd.getpwnam(user)[2:4]
-
 
 def get_checkresults():
     """ Returns a list of all checkresults on local nagios server. Data is returned as a list of statuses.
@@ -28,36 +25,50 @@ def get_checkresults():
     return result
 
 
-def post_checkresults(hosts=None, services=None):
-    """
+def post_checkresults(hosts=None, services=None, check_existance=True, create_services=True, create_hosts=False):
+    """ Puts a list of hosts into local instance of nagios checkresults
     Arguments:
-      data     -- list of dicts,
+      hosts               -- list of dicts, like one obtained from get_checkresults
+      services            -- list of dicts, like one obtained from get_checkresults
+      check_existance     -- If True, check (and log) if objects already exist before posting
+      create_services -- If True, autocreate non-existing services (where the host already exists)
+      create_hosts    -- If True, autocreate non-existing hosts
     """
+
     fd, filename = tempfile.mkstemp(prefix='c', dir=check_result_path)
     if not hosts:
         hosts = []
     if not services:
         services = []
+
+    if check_existance:
+        checkresults_overhaul(hosts, services, create_services=create_services, create_hosts=create_hosts)
     checkresults = '### Active Check Result File Made by Nago ###\n'
     checkresults += 'file_time=%s' % (int(time.time()))
-    checkresults += "\n"
     checkresults = ''
-    with open(filename, 'w') as f:
-        for host in hosts:
-            checkresults += _format_checkresult(**host)
-        for service in services:
-            checkresults += _format_checkresult(**service)
-        f.write(checkresults)
-    #os.close(fd)
+
+    for host in hosts:
+        checkresults += _format_checkresult(**host)
+    for service in services:
+        checkresults += _format_checkresult(**service)
+    os.write(fd, checkresults)
+
+    # Cleanup and make sure our file is readable by nagios
+    os.close(fd)
     os.chmod(filename, 0644)
+
+    # Create an ok file, so nagios knows it's ok to reap our changes
     file('%s.ok' % filename, 'w')
 
 
-def _format_checkresult(**kwargs):
-    """ Returns a string in a nagios "checkresults" compatible format
+def checkresults_overhaul(hosts, services, create_services, create_hosts):
+    """ Iterates through hosts and services, and filters out those who do not exist in our local monitoring core
 
-
+    If create_services or create_hosts are defined, then
     """
+
+def _format_checkresult(**kwargs):
+    """ Returns a string in a nagios "checkresults" compatible format """
     o = {}
     o['check_type'] = '1'
     o['check_options'] = '0'
@@ -97,6 +108,7 @@ def _format_checkresult(**kwargs):
         template += "service_description={service_description}\n"
     if not o['performance_data'].endswith('\\n'):
         o['performance_data'] += '\\n'
+
     # Format the string and return
     return template.format(**o) + '\n'
 
@@ -121,6 +133,8 @@ def get_peer(token):
     return all_peers[token]
 
 
+# This is an example of what checkresult file looks like to nagios. This is used by
+# _format_checkresult()
 _host_check_result = """
 host_name={host_name}
 check_type={check_type}
