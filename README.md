@@ -1,0 +1,4 @@
+Nago
+====
+A monitoring aggregator
+
