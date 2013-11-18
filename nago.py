@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+""" This is a CLI to nago """
 
 import nago
 import sys
@@ -19,6 +20,15 @@ def parse_arguments(arglist=sys.argv[1:]):
     arg1 = arglist[0]
     if arg1 == 'peer':
         peer(arglist[1:])
+    elif arg1 == 'checkresults':
+        checkresults(arglist[1:])
+
+
+def checkresults(arglist):
+    """ This is the checkresults subcommand """
+    options = optparse.OptionParser()
+    (opts,args) = options.parse_args(arglist)
+
 
 
 def peer(arglist):
