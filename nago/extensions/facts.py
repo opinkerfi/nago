@@ -7,11 +7,12 @@ posting facts is also supported, which means the agent will store facts about a 
 
 """
 
+from nago.core import nago_access
 facts = {}
 from pynag.Utils import runCommand
 
-
-def get_facts():
+@nago_access
+def get():
     """ Get all facts about this machine.
 
     Returns:
@@ -21,8 +22,8 @@ def get_facts():
     facts = result[1]
     return facts
 
-
-def post_facts(token, new_facts):
+@nago_access
+def post(token, new_facts):
     """ Store facts about a remote host in memory.
 
     Facts will be stored in nago.extensions.facts with the remote token as a key

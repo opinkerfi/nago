@@ -11,12 +11,13 @@ import time
 import os
 import os.path
 import tempfile
+from nago.core import nago_access
 
 c = config()
 c.parse_maincfg()
 check_result_path = c.get_cfg_value("check_result_path")
 
-
+@nago_access
 def get_checkresults():
     """ Returns a list of all checkresults on local nagios server. Data is returned as a list of statuses.
     """
@@ -28,7 +29,7 @@ def get_checkresults():
     result['services'] = services
     return result
 
-
+@nago_access
 def post_checkresults(hosts=None, services=None, check_existance=True, create_services=True, create_hosts=False):
     """ Puts a list of hosts into local instance of nagios checkresults
     Arguments:
