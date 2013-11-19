@@ -1,1 +1,1 @@
-__author__ = 'palli'
+from nago.extensions import checkresults
