@@ -22,7 +22,7 @@ def parse_arguments(arglist=sys.argv[1:]):
     arg1 = arglist[0]
     if arg1 == 'peer':
         peer(arglist[1:])
-    elif arg1 in nago.extensions.get_extensions():
+    elif arg1 in nago.extensions.get_extension_names():
         call_extension(arg1, *arglist[1:])
     else:
         raise Exception("invalid usage")
@@ -40,14 +40,14 @@ def call_extension(extension_name, *args, **kwargs):
 
     options = optparse.OptionParser()
     options.usage = "Usage: nago %s <action> [OPTIONS]" % extension_name
-    options.usage += '\nDESCRIPTION\n===========\n'
-    options.usage += extension.__doc__
-    options.usage += "\nACTIONS\n======="
+    options.usage += '\n\nDESCRIPTION\n===========\n\n'
+    options.usage += extension.__doc__.strip()
+    options.usage += "\n\nACTIONS\n=======\n"
     for action in available_commands:
         method = nago.extensions.get_method(extension_name, action)
         help_text = method.__doc__
-        options.usage += "* %s():" % action
-        options.usage += help_text
+        options.usage += "\n* %s():" % action
+        options.usage += help_text + "\n"
 
     if not args or args[0] == 'help':
         options.error("No subcommand provided.")
@@ -56,7 +56,19 @@ def call_extension(extension_name, *args, **kwargs):
     method = nago.extensions.get_method(extension_name, command)
     if not command in available_commands:
         options.error("Extension %s does not have an action called %s" % (extension_name, command))
-    print method(*args[1:])
+
+    # Parse any command line arguments sent
+    kwargs = {}
+    arguments = []
+    for i in args[1:]:
+        if i.find('=') > 0:
+            key, value = i.split('=', 1)
+            kwargs[key] = value
+        else:
+            arguments.append(i)
+
+    result =  method(*arguments, **kwargs)
+    print result
 
 
 

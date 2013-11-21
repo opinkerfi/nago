@@ -1,7 +1,17 @@
 from nago.core import nago_access, get_peer
 import inspect
+""" Extensions module for Nago
 
-__localaccess__ = object()
+All actual domain and check-specific logic of Nago should live as an extension.
+
+Any method created here under @nago.core.nago_access decorator is automatically
+made available to the message bus.
+
+Take a look at facts.py for an example of a simple extension.
+"""
+
+__localaccess__ = object()  # If you are working locally on this machine, you can proof it with this
+__loaded_extensions = {}    # Extensions are loaded here with the load() method
 
 
 class NagoError(Exception):
@@ -12,17 +22,19 @@ class ExtensionError(NagoError):
     pass
 
 
-
-__loaded_extensions = {}
-
-
 @nago_access
 def test():
     print __file__, __name__
 
 
+def get_extension_names():
+    """ Returns a list of the names of every loaded extension  """
+    return get_extensions().keys()
+
+
 def get_extensions():
-    return __loaded_extensions.keys()
+    """ Returns all extensions in a dictionary  """
+    return __loaded_extensions
 
 
 def get_methods(extension_name):
@@ -34,11 +46,13 @@ def get_methods(extension_name):
             methods.append(name)
     return methods
 
+
 def get_method(extension_name, method_name):
     """ Return a specific python method """
     extension = get_extension(extension_name)
     method = extension.__getattribute__(method_name)
     return method
+
 
 def get_extension(extension_name):
     return __loaded_extensions[extension_name]
@@ -65,13 +79,8 @@ def call_method(token, extension_name, method_name, *args, **kwargs):
     return method(*args, **kwargs)
 
 
-
 if not __loaded_extensions:
+    # TODO: autodiscovery of extensions
     load('checkresults')
     load('facts')
-
-    #call_method('checkresults', 'get_checkresults')
-    #for i in get_extensions():
-    #    print i, get_methods(i)
-
-#call_method('123', 'checkresults', 'get_checkresults')
+    load('peers')

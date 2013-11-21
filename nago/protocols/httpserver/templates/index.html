@@ -1,0 +1,60 @@
+<html>
+<head>
+  <link rel="stylesheet" href="http://pall.sigurdsson.is/css/style.css" />
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+  <div id="main" style="align: center">
+      <div id="box">
+          <h1>Welcome, friend</h1>
+          <table class=table>
+              <thead>
+                  <tr>
+                    <th>Attribute</th>
+                    <th>Description</th>
+                  </tr>
+              </thead>
+              <tbody>
+                <tr>
+                    <td>Token</td>
+                    <td>{{ token }}</td>
+                </tr>
+                <tr>
+                  <td>Host Name</td>
+                  <td>{{peer.host_name}}</td>
+                </tr>
+                <tr>
+                  <td>Access</td>
+                  <td>{{peer.access }}</td>
+                </tr>
+                <tr>
+                  <td>Address</td>
+                  <td>{{ peer.address }}</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </tbody>
+          </table>
+
+          <h1>Loaded extensions</h1>
+          <table class="table">
+              <thead>
+              <tr>
+                  <th></th>
+              </tr>
+              </thead>
+              <tbody>
+              {% for extension in extensions %}
+                  <tr>
+                      <td>{{extension}}</td>
+                  </tr>
+              {% endfor %}
+              </tbody>
+          </table>
+       </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<html>
+<head>
+  <link rel="stylesheet" href="http://pall.sigurdsson.is/css/style.css" />
+</head>
+<body>
+  <div id="main">
+      <div id="box">
+            <p>Access denied for {{token}}({{host_name}}) - It has not been signed yet</p>
+            <form method="POST" action="/">
+                <p><input type=text name="token">
+                <p><input type=submit value="Login with a another token">
+            </form>
+       </div>
+  </div>
+</body>
+</html>
