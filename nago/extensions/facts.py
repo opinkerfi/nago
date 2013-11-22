@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-""" Nago facts extension.
+""" Extension for the facter command
 
 This extension allows getting facts (via 'facter' command) about this host,
 
