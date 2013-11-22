@@ -47,7 +47,10 @@ def get_peers():
     config = ConfigParser.ConfigParser()
     config.read(cfg_file)
     result = {}
-    for token in config.sections():
+    for section in config.sections():
+        if section in ['main']:
+            continue
+        token = section
         peer = Peer(token)
         for key, value in config.items(token):
             peer[key] = value
