@@ -75,7 +75,10 @@ def call_method(token, extension_name, method_name, *args, **kwargs):
     if token != __localaccess__:
         peer = get_peer(token)
         if peer.get('access') != 'master' and peer.get('access') != method.nago_access:
-            raise NagoError("security token '%s' is not good enough to call %s.%s" % (token, extension_name, method_name))
+            result = {}
+            result['status'] = 'error'
+            result['message'] ="security token '%s' is authorized %s.%s" % (token, extension_name, method_name)
+            return result
     return method(*args, **kwargs)
 
 
@@ -84,3 +87,4 @@ if not __loaded_extensions:
     load('checkresults')
     load('facts')
     load('peers')
+    load('settings')
