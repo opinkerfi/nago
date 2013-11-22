@@ -50,8 +50,18 @@ def http403():
 def index():
     token = session.get('token')
     peer = nago.core.get_peer(token)
-    extensions = nago.extensions.get_extensions()
 
+    extension_dict = nago.extensions.get_extensions()
+    extensions = {}
+    for k, v in extension_dict.items():
+        print v.__doc__
+        extensions[k] = {}
+        extensions[k]['description'] = v.__doc__
+        extensions[k]['methods'] = {}
+        for name in nago.extensions.get_methods(k):
+            method = nago.extensions.get_method(k, name)
+            extensions[k]['methods'][name] = {}
+            extensions[k]['methods'][name]['description'] = method.__doc__
     return render_template('index.html', **locals())
 
 

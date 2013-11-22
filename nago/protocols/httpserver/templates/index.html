@@ -1,60 +1,75 @@
 <html>
 <head>
   <link rel="stylesheet" href="http://pall.sigurdsson.is/css/style.css" />
-    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+
 </head>
 <body>
 
-  <div id="main" style="align: center">
-      <div id="box">
-          <h1>Welcome, friend</h1>
-          <table class=table>
-              <thead>
-                  <tr>
-                    <th>Attribute</th>
-                    <th>Description</th>
-                  </tr>
-              </thead>
-              <tbody>
-                <tr>
-                    <td>Token</td>
-                    <td>{{ token }}</td>
-                </tr>
-                <tr>
-                  <td>Host Name</td>
-                  <td>{{peer.host_name}}</td>
-                </tr>
-                <tr>
-                  <td>Access</td>
-                  <td>{{peer.access }}</td>
-                </tr>
-                <tr>
-                  <td>Address</td>
-                  <td>{{ peer.address }}</td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                </tr>
-              </tbody>
-          </table>
+    <div id="main" ">
+        <div id="box" >
+            <div class="main_body"><div class="content"><div class=wrapper><div class="main_content">
+              <h1>Welcome, friend</h1>
+              <table class=table>
+                  <thead>
+                      <tr>
+                        <th>Attribute</th>
+                        <th>Description</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                        <td>Token</td>
+                        <td>{{ token }}</td>
+                    </tr>
+                    <tr>
+                      <td>Host Name</td>
+                      <td>{{peer.host_name}}</td>
+                    </tr>
+                    <tr>
+                      <td>Access</td>
+                      <td>{{peer.access }}</td>
+                    </tr>
+                    <tr>
+                      <td>Address</td>
+                      <td>{{ peer.address }}</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+              </table>
 
-          <h1>Loaded extensions</h1>
-          <table class="table">
-              <thead>
-              <tr>
-                  <th></th>
-              </tr>
-              </thead>
-              <tbody>
-              {% for extension in extensions %}
+              <h1>Loaded extensions</h1>
+              <table class="table">
+                  <thead>
                   <tr>
-                      <td>{{extension}}</td>
+                      <th></th>
                   </tr>
-              {% endfor %}
-              </tbody>
-          </table>
-       </div>
-  </div>
+                  </thead>
+                  <tbody>
+                  {% for extension_name, extension in extensions.items() %}
+                      <tr>
+                          <th>{{extension_name}}</th>
+                          <td colspan="2">{{extension.description}} </td>
+                      </tr>
+                        {% for method_name, method in extension.methods.items() %}
+                      <tr>
+                          <td></td>
+                          <td>
+                              <a href='{{ url_for("call_method", extension_name=extension_name, method_name=method_name) }}'>
+                                {{method_name}}
+                              </a>
+                          </td>
+                          <td>{{method.description}}</td>
+                      </tr>
+                        {% endfor %}
+                        <tr><td colspan="3"><hr></td></tr>
+                  {% endfor %}
+                  </tbody>
+              </table>
+
+            </div></div></div></div>
+        </div>
 </body>
 </html>
