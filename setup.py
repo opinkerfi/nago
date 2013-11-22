@@ -24,7 +24,7 @@ if __name__ == "__main__":
         description=SHORT_DESC,
         long_description=LONG_DESC,
         author_email='palli@opensource.is',
-        url='http://okconfig.org',
+        url='http://github.com/opinkerfi/nago',
         license='GPL',
         scripts=['scripts/nago'],
         packages=['nago','nago.extensions','nago.core','nago.settings','nago.protocols','nago.protocols.httpserver'],
