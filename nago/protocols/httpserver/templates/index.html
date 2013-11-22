@@ -5,37 +5,42 @@
 </head>
 <body>
 
-    <div id="main" ">
+    <div id="main">
         <div id="box" >
             <div class="main_body"><div class="content"><div class=wrapper><div class="main_content">
               <h1>Welcome, friend</h1>
-              <table class=table>
+              <table class=table border=1 style="width: 100%; border-collapse:collapse; border: 0.5px solid grey;">
                   <thead>
                       <tr>
-                        <th>Attribute</th>
-                        <th>Description</th>
+                        <th colspan="2">About me</th>
+                        <th colspan="2">About you</th>
                       </tr>
                   </thead>
                   <tbody>
                     <tr>
-                        <td>Token</td>
-                        <td>{{ token }}</td>
-                    </tr>
-                    <tr>
+                        <td>Host Name</td>
+                        <td>{{ my_info.host_name }}</td>
                       <td>Host Name</td>
                       <td>{{peer.host_name}}</td>
                     </tr>
                     <tr>
+                        <td>Distribution</td>
+                        <td>{{my_info.dist}}</td>
+                        <td>Token</td>
+                        <td>{{ token }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>Nago Version</td>
+                        <td>{{my_info.nago_version}}</td>
                       <td>Access</td>
                       <td>{{peer.access }}</td>
                     </tr>
                     <tr>
+                        <td></td>
+                        <td></td>
                       <td>Address</td>
                       <td>{{ peer.address }}</td>
-                    </tr>
-                    <tr>
-                      <td></td>
-                      <td></td>
                     </tr>
                   </tbody>
               </table>
@@ -51,7 +56,7 @@
                   {% for extension_name, extension in extensions.items() %}
                       <tr>
                           <th>{{extension_name}}</th>
-                          <td colspan="2">{{extension.description}} </td>
+                          <td colspan="2">{{extension.shortdesc}} </td>
                       </tr>
                         {% for method_name, method in extension.methods.items() %}
                       <tr>

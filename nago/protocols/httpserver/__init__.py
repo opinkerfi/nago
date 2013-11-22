@@ -7,7 +7,8 @@ from flask import Flask, request, session, g, redirect, url_for, abort, render_t
 from functools import wraps
 import nago.core
 import nago.extensions
-
+import platform
+import nago
 
 app = Flask(__name__)
 app.secret_key = 'bla'
@@ -27,6 +28,17 @@ def login_required(func, permission=None):
         return func(*args, **kwargs)
     return decorated_function
 
+
+def get_my_info():
+    """ Return misc information about this node
+    """
+    result = {}
+    result['host_name'] = platform.node()
+    result['dist'] = platform.dist()
+    result['nago_version'] = nago.get_version()
+    return result
+
+
 def check_token():
     if 'token' in request.args :
         session['token'] = request.args.get('token')
@@ -37,6 +49,7 @@ def check_token():
         return True
     else:
         return False
+
 
 @app.route('/403', methods=['GET', 'POST'])
 def http403():
@@ -51,12 +64,15 @@ def index():
     token = session.get('token')
     peer = nago.core.get_peer(token)
 
+    my_info = get_my_info()
+
     extension_dict = nago.extensions.get_extensions()
     extensions = {}
     for k, v in extension_dict.items():
         print v.__doc__
         extensions[k] = {}
         extensions[k]['description'] = v.__doc__
+        extensions[k]['shortdesc'] = str(v.__doc__).splitlines()[0]
         extensions[k]['methods'] = {}
         for name in nago.extensions.get_methods(k):
             method = nago.extensions.get_method(k, name)
