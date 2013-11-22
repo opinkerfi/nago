@@ -64,7 +64,7 @@ def load(extension_name):
         extension = __import__(extension_name, globals(), locals(), [''])
         __loaded_extensions[extension_name] = extension
     except Exception, e:
-        nago.core.log("Failed to load extension %s: %s" % (extension_name, e))
+        nago.core.log("Failed to load extension %s: %s" % (extension_name, e), level='error')
 
 
 def call_method(token, extension_name, method_name, *args, **kwargs):
