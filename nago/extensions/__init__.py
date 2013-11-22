@@ -1,4 +1,5 @@
 from nago.core import nago_access, get_peer
+import nago.core
 import inspect
 """ Extensions module for Nago
 
@@ -59,8 +60,10 @@ def get_extension(extension_name):
 
 
 def load(extension_name):
-    extension = __import__(extension_name, globals(), locals(), [''])
-    __loaded_extensions[extension_name] = extension
+    try:
+        extension = __import__(extension_name, globals(), locals(), [''])
+        __loaded_extensions[extension_name] = extension
+    nago.core.log("Failed to load extension %s: %s" % (extension_name, e))
 
 
 def call_method(token, extension_name, method_name, *args, **kwargs):
