@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-""" Nago checkresults extension.
+""" Get and post nagios checkresults between nago instances
 
 This extension allows to get status data from a local nagios server.
 
@@ -18,8 +18,8 @@ c.parse_maincfg()
 check_result_path = c.get_cfg_value("check_result_path")
 
 @nago_access
-def get_checkresults():
-    """ Returns a list of all checkresults on local nagios server. Data is returned as a list of statuses.
+def get():
+    """ Get all nagios status information from a local nagios instance
     """
     livestatus = mk_livestatus()
     hosts = livestatus.get_hosts()
@@ -30,7 +30,7 @@ def get_checkresults():
     return result
 
 @nago_access
-def post_checkresults(hosts=None, services=None, check_existance=True, create_services=True, create_hosts=False):
+def post(hosts=None, services=None, check_existance=True, create_services=True, create_hosts=False):
     """ Puts a list of hosts into local instance of nagios checkresults
     Arguments:
       hosts               -- list of dicts, like one obtained from get_checkresults
