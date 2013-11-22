@@ -26,6 +26,6 @@ if __name__ == "__main__":
         author_email='palli@opensource.is',
         url='http://okconfig.org',
         license='GPL',
-        scripts=['nago.py'],
+        scripts=['scripts/nago'],
         packages=['nago','nago.extensions','nago.core','nago.settings','nago.protocols','nago.protocols.httpserver'],
     )
