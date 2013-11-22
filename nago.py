@@ -28,7 +28,7 @@ def parse_arguments(args=sys.argv[1:]):
     opts, args = parser.parse_args(args)
     if not args:
         parser.error("No sub-command given. See %prog --help for more info")
-    arg1 = args.pop(0)
+    arg1 = args[0]
     if arg1 in nago.extensions.get_extension_names():
         call_extension(arg1, *args[1:])
     else:
@@ -59,7 +59,7 @@ def call_extension(extension_name, *args):
     if not args or args[0] == 'help':
         options.error("No subcommand provided.")
 
-    command = args.pop(0)
+    command = args[0]
     method = nago.extensions.get_method(extension_name, command)
     if not command in available_commands:
         options.error("Extension %s does not have an action called %s" % (extension_name, command))
@@ -67,7 +67,7 @@ def call_extension(extension_name, *args):
     # Parse any command line arguments sent
     kwargs = {}
     arguments = []
-    for i in args:
+    for i in args[1:]:
         if i.find('=') > 0:
             key, value = i.split('=', 1)
             kwargs[key] = value
