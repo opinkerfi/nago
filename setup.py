@@ -27,5 +27,5 @@ if __name__ == "__main__":
         url='http://okconfig.org',
         license='GPL',
         scripts=['nago.py'],
-        packages=['nago'],
+        packages=['nago','nago.extensions','nago.core','nago.settings','nago.protocols','nago.protocols.httpserver'],
     )
