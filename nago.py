@@ -5,6 +5,8 @@ import nago
 import sys
 import getopt
 import optparse
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
 
 import nago.extensions
 
@@ -68,7 +70,7 @@ def call_extension(extension_name, *args, **kwargs):
             arguments.append(i)
 
     result =  method(*arguments, **kwargs)
-    print result
+    pp.pprint(result)
 
 
 
