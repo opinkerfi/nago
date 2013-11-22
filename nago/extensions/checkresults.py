@@ -13,9 +13,6 @@ import os.path
 import tempfile
 from nago.core import nago_access
 
-c = config()
-c.parse_maincfg()
-check_result_path = c.get_cfg_value("check_result_path")
 
 @nago_access
 def get():
@@ -39,6 +36,11 @@ def post(hosts=None, services=None, check_existance=True, create_services=True, 
       create_services -- If True, autocreate non-existing services (where the host already exists)
       create_hosts    -- If True, autocreate non-existing hosts
     """
+
+    nagios_config = config()
+    nagios_config.parse_maincfg()
+    check_result_path = c.get_cfg_value("check_result_path")
+
 
     fd, filename = tempfile.mkstemp(prefix='c', dir=check_result_path)
     if not hosts:
