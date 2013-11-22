@@ -5,32 +5,37 @@ import nago
 import sys
 import getopt
 import optparse
+import nago.extensions
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
-import nago.extensions
 
+def parse_arguments(args=sys.argv[1:]):
+    extension_names = nago.extensions.get_extension_names()
 
-def print_usage(exit_code=1):
-    """ Print usage, and exit the program
-    """
-    print "Usage: nago peer [OPTIONS]"
-    sys.exit(exit_code)
-
-
-def parse_arguments(arglist=sys.argv[1:]):
-    if not arglist:
-        print_usage(exit_code=1)
-    arg1 = arglist[0]
-    if arg1 == 'peer':
-        peer(arglist[1:])
-    elif arg1 in nago.extensions.get_extension_names():
-        call_extension(arg1, *arglist[1:])
+    parser = optparse.OptionParser()
+    parser.usage = "%prog [options] <subcommand> <action>"
+    parser.usage += "\n\nAvailable subcommands:\n"
+    for i in extension_names:
+        parser.usage += "* %s\n" % i
+    parser.usage += '\nExamples:\n'
+    parser.usage += "# Configure default server to use:\n"
+    parser.usage += '%prog settings set server=<my_nago_server>\n\n'
+    parser.usage += "# List all configured nodes:\n"
+    parser.usage += '%prog peers list all\n\n'
+    parser.add_option('-c', '--config', help='path to nago.ini config file', default="/etc/nago/nago.ini")
+    parser.add_option('-H', '--server', help='server to connect to (default localhost)', default=None)
+    opts, args = parser.parse_args(args)
+    if not args:
+        parser.error("No sub-command given. See %prog --help for more info")
+    arg1 = args.pop(0)
+    if arg1 in nago.extensions.get_extension_names():
+        call_extension(arg1, *args[1:])
     else:
         raise Exception("invalid usage")
 
 
-def call_extension(extension_name, *args, **kwargs):
+def call_extension(extension_name, *args):
     """ Call an extensions that has been loaded into nago.extentions
 
     First argument should a command inside that extension that will be run.
@@ -54,7 +59,7 @@ def call_extension(extension_name, *args, **kwargs):
     if not args or args[0] == 'help':
         options.error("No subcommand provided.")
 
-    command = args[0]
+    command = args.pop(0)
     method = nago.extensions.get_method(extension_name, command)
     if not command in available_commands:
         options.error("Extension %s does not have an action called %s" % (extension_name, command))
@@ -62,39 +67,15 @@ def call_extension(extension_name, *args, **kwargs):
     # Parse any command line arguments sent
     kwargs = {}
     arguments = []
-    for i in args[1:]:
+    for i in args:
         if i.find('=') > 0:
             key, value = i.split('=', 1)
             kwargs[key] = value
         else:
             arguments.append(i)
 
-    result =  method(*arguments, **kwargs)
+    result = method(*arguments, **kwargs)
     pp.pprint(result)
 
-
-
-
-def peer(arglist):
-    """ This is the peer subcommand
-    """
-    options = optparse.OptionParser()
-    options.add_option('--list', dest='list', help="List new peers", action="store_true", default=False)
-    options.add_option('--all', dest='all', help="Apply to all peers", action='store_true', default=False)
-    (opts,args) = options.parse_args(arglist)
-    peers = nago.get_peers()
-    if opts.list is True:
-        for token_id, i in peers.items():
-            if i.get('access') is None or opts.all:
-                print i.get('host_name'), i.get('address'), token_id
-    elif args:
-        for i in args:
-            if i not in peers:
-                print "Peer not found: ", i
-            else:
-                print "# Details for ", i
-                for key, value in peers[i].items():
-                    print key, value
-
-
-parse_arguments()
+if __name__ == '__main__':
+    parse_arguments()
