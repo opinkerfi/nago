@@ -39,7 +39,7 @@ def post(hosts=None, services=None, check_existance=True, create_services=True, 
 
     nagios_config = config()
     nagios_config.parse_maincfg()
-    check_result_path = c.get_cfg_value("check_result_path")
+    check_result_path = nagios_config.get_cfg_value("check_result_path")
 
 
     fd, filename = tempfile.mkstemp(prefix='c', dir=check_result_path)

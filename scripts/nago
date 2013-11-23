@@ -22,7 +22,7 @@ def parse_arguments(args=sys.argv[1:]):
     parser.usage += "# Configure default server to use:\n"
     parser.usage += '%prog settings set server=<my_nago_server>\n\n'
     parser.usage += "# List all configured nodes:\n"
-    parser.usage += '%prog peers list all\n\n'
+    parser.usage += '%prog nodes list all\n\n'
     parser.add_option('-c', '--config', help='path to nago.ini config file', default="/etc/nago/nago.ini")
     parser.add_option('-H', '--server', help='server to connect to (default localhost)', default=None)
     opts, args = parser.parse_args(args)

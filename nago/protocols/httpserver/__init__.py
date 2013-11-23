@@ -54,15 +54,15 @@ def check_token():
 @app.route('/403', methods=['GET', 'POST'])
 def http403():
     token = session.get('token')
-    peer = nago.core.get_peer(token) or {}
-    host_name = peer.get('host_name') or ''
+    node = nago.core.get_node(token) or {}
+    host_name = node.get('host_name') or ''
     return render_template('403.html', **locals())
 
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
     token = session.get('token')
-    peer = nago.core.get_peer(token)
+    node = nago.core.get_node(token)
 
     my_info = get_my_info()
 
@@ -91,8 +91,8 @@ def login():
 @login_required
 def extension(extension_name):
     token = session.get('token')
-    peer = nago.core.get_peer(token) or {}
-    host_name = peer.get('host_name') or ''
+    node = nago.core.get_node(token) or {}
+    host_name = node.get('host_name') or ''
     return render_template('index.html', **locals())
 
 
@@ -100,8 +100,8 @@ def extension(extension_name):
 @login_required
 def list_extensions():
     token = session.get('token')
-    peer = nago.core.get_peer(token) or {}
-    host_name = peer.get('host_name') or ''
+    node = nago.core.get_node(token) or {}
+    host_name = node.get('host_name') or ''
     extensions = nago.extensions.get_extensions()
     result = {}
     for k, v in extensions.items():
@@ -120,6 +120,7 @@ def list_extensions():
 @app.route('/extensions/<extension_name>/<method_name>/', methods=['GET', 'POST'])
 @login_required
 def call_method(extension_name, method_name):
+    print args
     kwargs = {}
     for k, v in request.args.items():
         kwargs[k] = v

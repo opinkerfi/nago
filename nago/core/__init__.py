@@ -40,8 +40,8 @@ def nago_access(func):
     return func
 
 
-def get_peers():
-    """ Returns all peers in a list of dicts format
+def get_nodes():
+    """ Returns all nodes in a list of dicts format
     """
     cfg_file = "/etc/nago/nago.ini"
     config = ConfigParser.ConfigParser()
@@ -51,22 +51,22 @@ def get_peers():
         if section in ['main']:
             continue
         token = section
-        peer = Peer(token)
+        node = Node(token)
         for key, value in config.items(token):
-            peer[key] = value
-        result[token] = peer
+            node[key] = value
+        result[token] = node
     return result
 
 
-def get_peer(token):
-    all_peers = get_peers()
-    return all_peers.get(token)
+def get_node(token):
+    all_nodes = get_nodes()
+    return all_nodes.get(token)
 
 
 def has_access(token):
     """ Returns true if specified token exists and is marked as "allowed" """
-    peer = get_peer(token) or {}
-    if peer.get('access'):
+    node = get_node(token) or {}
+    if node.get('access'):
         return True
     return False
 
@@ -91,8 +91,8 @@ def generate_token():
     return token
 
 
-class Peer(object):
-    """ Represents one specific peer (another nago client) """
+class Node(object):
+    """ Represents one specific node (another nago client) """
     def __init__(self, token=None, **kwargs):
         if not token:
             token = generate_token()
@@ -110,7 +110,7 @@ class Peer(object):
         self.data[item] = value
 
     def save(self):
-        """ Save this peer (and all its attributes) to config """
+        """ Save this node (and all its attributes) to config """
         cfg_file = "/etc/nago/nago.ini"
         config = ConfigParser.ConfigParser()
         config.read(cfg_file)
@@ -144,7 +144,7 @@ class Peer(object):
         arguments['token'] = arguments.pop('token', self.token)
 
         if not uri and not address:
-            raise Exception("We need either a remote address or uri to connect to peer")
+            raise Exception("We need either a remote address or uri to connect to node")
         elif not uri:
             uri = "http://{address}:{port}".format(**locals())
 

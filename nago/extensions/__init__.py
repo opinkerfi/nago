@@ -1,4 +1,4 @@
-from nago.core import nago_access, get_peer
+from nago.core import nago_access, get_node
 import nago.core
 import inspect
 """ Extensions module for Nago
@@ -77,8 +77,8 @@ def call_method(token, extension_name, method_name, *args, **kwargs):
 
     # Check the security token, check if we have access to this method
     if token != __localaccess__:
-        peer = get_peer(token)
-        if peer.get('access') != 'master' and peer.get('access') != method.nago_access:
+        node = get_node(token)
+        if node.get('access') != 'master' and node.get('access') != method.nago_access:
             result = {}
             result['status'] = 'error'
             result['message'] ="security token '%s' is authorized %s.%s" % (token, extension_name, method_name)
@@ -90,5 +90,5 @@ if not __loaded_extensions:
     # TODO: autodiscovery of extensions
     load('checkresults')
     load('facts')
-    load('peers')
+    load('nodes')
     load('settings')

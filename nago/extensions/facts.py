@@ -8,7 +8,7 @@ posting facts is also supported, which means the agent will store facts about a 
 """
 
 from nago.core import nago_access
-from nago.core import get_peers
+from nago.core import get_nodes
 import json
 facts = {}
 from pynag.Utils import runCommand
@@ -48,19 +48,19 @@ def send(remote_host=None):
     if remote_host is provided, data will be sent to that host. Otherwise it will be sent to master.
     """
     my_facts = get()
-    remote_peer = None  # Here we will store the Peer we connect to
+    remote_node = None  # Here we will store the Node we connect to
 
-    for token, i in get_peers().items():
+    for token, i in get_nodes().items():
         if token == remote_host:
-            remote_peer = i
+            remote_node = i
             break
         elif remote_host is None and i.get('access') == 'master':
-            remote_peer = i
+            remote_node = i
             break
-    if not remote_peer:
+    if not remote_node:
         raise Exception("Remote host with token='%s' not found" % remote_host)
-    result = remote_peer.send_command('facts', 'post', host_token=remote_peer.token, **my_facts)
-    return "sent %s facts to remote peer '%s'" % (len(my_facts), remote_peer.token)
+    result = remote_node.send_command('facts', 'post', host_token=remote_node.token, **my_facts)
+    return "sent %s facts to remote node '%s'" % (len(my_facts), remote_node.token)
 
 
 
