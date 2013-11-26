@@ -10,6 +10,9 @@ import json
 import requests
 import urllib
 
+import platform
+import nago
+
 from pynag.Parsers import mk_livestatus, config
 
 # List of log entries since program start. Format should be:
@@ -58,9 +61,11 @@ def get_nodes():
     return result
 
 
-def get_node(token):
-    all_nodes = get_nodes()
-    return all_nodes.get(token)
+def get_node(token_or_hostname):
+    for name, node in get_nodes().items():
+        if token_or_hostname in (name, node.get('host_name'), node.get('address'), node.get('uri')):
+            return node
+    return None
 
 
 def has_access(token):
@@ -153,7 +158,26 @@ class Node(object):
 
         uri += querystring
         log("Connecting to {uri}".format(**locals()), level="debug")
-        content = requests.get(uri).content
-        results = json.loads(content)
-        return results
+        try:
+            content = requests.get(uri).content
+            log(message="Successfully connected to %s" % uri, level="debug")
+            results = json.loads(content)
+            return results
+        except Exception, e:
+            results = {}
+            results['error'] = "Failed to connect to %s" % uri
+            results['error_type'] = type(e)
+            results['details'] = e
+            results['status'] = 'error'
+            return results
 
+
+def get_my_info():
+    """ Return misc information about this node
+    """
+    result = {}
+    result['host_name'] = platform.node()
+    result['real_host_name'] = platform.node()
+    result['dist'] = platform.dist()
+    result['nago_version'] = nago.get_version()
+    return result
