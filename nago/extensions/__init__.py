@@ -1,6 +1,7 @@
 from nago.core import nago_access, get_node
 import nago.core
 import inspect
+import os
 """ Extensions module for Nago
 
 All actual domain and check-specific logic of Nago should live as an extension.
@@ -63,8 +64,11 @@ def load(extension_name):
     try:
         extension = __import__(extension_name, globals(), locals(), [''])
         __loaded_extensions[extension_name] = extension
-    except Exception, e:
-        nago.core.log("Failed to load extension %s: %s" % (extension_name, e), level='error')
+        if 'on_load' in dir(extension):
+            extension.on_load()
+        nago.core.log(level="info", message="API Extension loaded: %s" % extension_name)
+    except KeyError, e:
+        nago.core.log("API Extension failed to load %s: %s" % (extension_name, e), level='error')
 
 
 def call_method(token, extension_name, method_name, *args, **kwargs):
@@ -81,14 +85,16 @@ def call_method(token, extension_name, method_name, *args, **kwargs):
         if node.get('access') != 'master' and node.get('access') != method.nago_access:
             result = {}
             result['status'] = 'error'
-            result['message'] ="security token '%s' is authorized %s.%s" % (token, extension_name, method_name)
+            result['message'] = "security token '%s' is authorized %s.%s" % (token, extension_name, method_name)
             return result
     return method(*args, **kwargs)
 
 
 if not __loaded_extensions:
-    # TODO: autodiscovery of extensions
-    load('checkresults')
-    load('facts')
-    load('nodes')
-    load('settings')
+    # Load all extensions in the same directory as the extensions package
+    extension_dir = os.path.dirname(__file__)
+    for dirpath, dirnames, filenames in os.walk(extension_dir):
+        for f in filenames:
+            if f.endswith('.py') and f[0].isalpha():
+                module_name = f[:-3]
+                load(module_name)
