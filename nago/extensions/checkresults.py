@@ -12,6 +12,7 @@ import os
 import os.path
 import tempfile
 from nago.core import nago_access
+import nago.extensions.settings
 
 
 @nago_access()
@@ -66,6 +67,16 @@ def post(hosts=None, services=None, check_existance=True, create_services=True, 
 
     # Create an ok file, so nagios knows it's ok to reap our changes
     file('%s.ok' % filename, 'w')
+
+@nago_access()
+def send(remote_host=None):
+    """ Send local nagios data to a remote nago instance """
+    my_data = get()
+    if not remote_host:
+        remote_host = nago.extensions.settings.get('server')
+    remote_node = nago.core.get_node(remote_host)
+    remote_node.send_command('checkresults', 'post', **my_data)
+    return "checkresults sent to %s" % remote_host
 
 
 def checkresults_overhaul(hosts, services, create_services, create_hosts):
