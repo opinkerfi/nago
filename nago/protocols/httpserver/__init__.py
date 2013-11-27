@@ -3,16 +3,18 @@
 """ A http server written in flask. Allows two or more nago instances to talk with each other
 
 """
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, jsonify
-from functools import wraps
-import nago.core
-import nago.extensions
-
 # this is a workaround for rhel6 systems where python-jinja has multiple versions
 # installed at the same time
 # https://bugzilla.redhat.com/show_bug.cgi?id=867105
 __requires__ = ['jinja2 >= 2.4']
 import pkg_resources
+
+
+from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, jsonify
+from functools import wraps
+import nago.core
+import nago.extensions
+
 
 
 app = Flask(__name__)
