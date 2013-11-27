@@ -8,6 +8,12 @@ from functools import wraps
 import nago.core
 import nago.extensions
 
+# this is a workaround for rhel6 systems where python-jinja has multiple versions
+# installed at the same time
+# https://bugzilla.redhat.com/show_bug.cgi?id=867105
+__requires__ = ['jinja2 >= 2.4']
+import pkg_resources
+
 
 app = Flask(__name__)
 app.secret_key = 'bla'
@@ -61,7 +67,6 @@ def index():
     extension_dict = nago.extensions.get_extensions()
     extensions = {}
     for k, v in extension_dict.items():
-        print v.__doc__
         extensions[k] = {}
         extensions[k]['description'] = v.__doc__
         extensions[k]['shortdesc'] = str(v.__doc__).splitlines()[0]
@@ -116,6 +121,7 @@ def call_method(extension_name, method_name):
     for k, v in request.args.items():
         kwargs[k] = v
     kwargs.pop('token', None)
+    kwargs.pop('json_data', None)
     token = session['token']
     result = {}
     result['result'] = nago.extensions.call_method(token=token, extension_name=extension_name, method_name=method_name, **kwargs)

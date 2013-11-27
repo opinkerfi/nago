@@ -2,6 +2,8 @@ from nago.core import nago_access, get_node
 import nago.core
 import inspect
 import os
+import json
+
 """ Extensions module for Nago
 
 All actual domain and check-specific logic of Nago should live as an extension.
@@ -76,7 +78,7 @@ def load(extension_name):
         nago.core.log("API Extension failed to load %s: %s" % (extension_name, e), level='error')
 
 
-def call_method(token, extension_name, method_name, *args, **kwargs):
+def call_method(token, extension_name, method_name, json_data=None, *args, **kwargs):
     """
 
     """
@@ -92,6 +94,12 @@ def call_method(token, extension_name, method_name, *args, **kwargs):
             result['status'] = 'error'
             result['message'] = "security token '%s' is authorized %s.%s" % (token, extension_name, method_name)
             return result
+
+    if json_data:
+        kwargs = kwargs.copy()
+        data = json.loads(json_data)
+        for k,v in data.items():
+            kwargs[k] = v
     return method(*args, **kwargs)
 
 

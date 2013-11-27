@@ -7,6 +7,7 @@ import getopt
 import optparse
 import nago.extensions
 import pprint
+import json
 pp = pprint.PrettyPrinter(indent=4)
 
 
@@ -70,7 +71,11 @@ def call_extension(extension_name, *args):
     for i in args[1:]:
         if i.find('=') > 0:
             key, value = i.split('=', 1)
-            kwargs[key] = value
+            if key == "json_data":
+                data = json.loads(value)
+                kwargs.update(data)
+            else:
+                kwargs[key] = value
         else:
             arguments.append(i)
 
