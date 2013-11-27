@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.7'
+__version__ = '0.8'
 
 
 def get_version():
