@@ -14,7 +14,7 @@ import tempfile
 from nago.core import nago_access
 
 
-@nago_access
+@nago_access()
 def get():
     """ Get all nagios status information from a local nagios instance
     """
@@ -26,7 +26,7 @@ def get():
     result['services'] = services
     return result
 
-@nago_access
+@nago_access()
 def post(hosts=None, services=None, check_existance=True, create_services=True, create_hosts=False):
     """ Puts a list of hosts into local instance of nagios checkresults
     Arguments:

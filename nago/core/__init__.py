@@ -12,7 +12,7 @@ import urllib
 
 import platform
 import nago
-
+from functools import wraps
 from pynag.Parsers import mk_livestatus, config
 
 # List of log entries since program start. Format should be:
@@ -33,14 +33,29 @@ def log(message, level="info"):
     entry['message'] = message
     entry['timestamp'] = now
     _log_entries.append(entry)
-    if level != 'debug':
+    if level not in ('debug', 'info'):
         print("{level}: {message}".format(**locals()))
 
 
-def nago_access(func):
-    """ Decorate other functions with this one to allow access """
-    func.nago_access = True
-    return func
+def nago_access(access_type="master", name=None):
+    """ Decorate other functions with this one to allow access
+
+    Arguments:
+        nago_access -- Type of access required to call this function
+                       By default only master is allowed to make that call
+
+        nago_name   -- What name this function will have to remote api
+                       Default is the same as the name of the function being
+                       decorated.
+    """
+    def real_decorator(func):
+        func.nago_access = access_type
+        func.nago_name = name or func.__name__
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+        return wrapper
+    return real_decorator
 
 
 def get_nodes():
@@ -153,7 +168,7 @@ class Node(object):
         elif not uri:
             uri = "http://{address}:{port}".format(**locals())
 
-        uri += "/extensions/{extension_name}/{method_name}?".format(**locals())
+        uri += "/api/{extension_name}/{method_name}?".format(**locals())
         querystring = urllib.urlencode(arguments.items())
 
         uri += querystring
@@ -173,7 +188,7 @@ class Node(object):
 
 
 def get_my_info():
-    """ Return misc information about this node
+    """ Return general information about this node
     """
     result = {}
     result['host_name'] = platform.node()

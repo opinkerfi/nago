@@ -43,7 +43,7 @@ def call_extension(extension_name, *args):
     If it is not provided, a list of all commands is printed instead.
     """
     extension = nago.extensions.get_extension(extension_name)
-    available_commands = nago.extensions.get_methods(extension_name)
+    available_commands = nago.extensions.get_method_names(extension_name)
 
     options = optparse.OptionParser()
     options.usage = "Usage: nago %s <action> [OPTIONS]" % extension_name

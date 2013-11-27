@@ -6,7 +6,7 @@ import nago.core
 import ConfigParser
 from nago.core import nago_access
 
-@nago_access
+@nago_access()
 def set(section='main', **kwargs):
     """ Change a single option in local configuration """
     cfg_file = "/etc/nago/nago.ini"
@@ -19,7 +19,7 @@ def set(section='main', **kwargs):
     return "Done"
 
 
-@nago_access
+@nago_access()
 def get(key, section='main'):
     """ Get a single option from """
     cfg_file = "/etc/nago/nago.ini"

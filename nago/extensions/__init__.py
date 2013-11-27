@@ -39,21 +39,26 @@ def get_extensions():
     return __loaded_extensions
 
 
-def get_methods(extension_name):
+def get_method_names(extension_name):
     """ List all remotely accessable methods of a specified extension """
+    return sorted(get_methods(extension_name).keys())
+
+
+def get_methods(extension_name):
+    """ Return all methods in extension that have nago_access set """
     extension = get_extension(extension_name)
-    methods = []
+    methods = {}
     for name, i in inspect.getmembers(extension):
         if hasattr(i, 'nago_access'):
-            methods.append(name)
+            api_name = i.nago_name
+            methods[api_name] = i
     return methods
 
 
 def get_method(extension_name, method_name):
     """ Return a specific python method """
-    extension = get_extension(extension_name)
-    method = extension.__getattribute__(method_name)
-    return method
+    methods = get_methods(extension_name)
+    return methods[method_name]
 
 
 def get_extension(extension_name):
@@ -67,7 +72,7 @@ def load(extension_name):
         if 'on_load' in dir(extension):
             extension.on_load()
         nago.core.log(level="info", message="API Extension loaded: %s" % extension_name)
-    except KeyError, e:
+    except Exception, e:
         nago.core.log("API Extension failed to load %s: %s" % (extension_name, e), level='error')
 
 

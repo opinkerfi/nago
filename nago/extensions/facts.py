@@ -13,7 +13,7 @@ import json
 facts = {}
 from pynag.Utils import runCommand
 
-@nago_access
+@nago_access()
 def get():
     """ Get local facts about this machine.
 
@@ -25,7 +25,7 @@ def get():
     facts = json.loads(json_facts)
     return facts
 
-@nago_access
+@nago_access()
 def post(host_token, **kwargs):
     """ Store facts about a remote host in memory.
 
@@ -36,12 +36,12 @@ def post(host_token, **kwargs):
     return "thanks!"
 
 
-@nago_access
+@nago_access()
 def get_all():
     """ Get all facts about all nodes """
     return facts
 
-@nago_access
+@nago_access()
 def send(remote_host=None):
     """ Send my facts to a remote host
 

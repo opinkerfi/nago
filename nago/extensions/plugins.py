@@ -9,7 +9,7 @@ import os.path
 import pynag.Utils
 import subprocess
 
-@nago_access
+@nago_access()
 def get(search="unsigned"):
     """ List all available plugins"""
     plugins = []
@@ -18,7 +18,7 @@ def get(search="unsigned"):
             plugins.append(f)
     return plugins
 
-@nago_access
+@nago_access()
 def run(plugin, *args, **kwargs):
     """ Run a specific plugin """
     plugin = '/usr/lib/nagios/plugins/' + plugin
@@ -34,7 +34,7 @@ def run(plugin, *args, **kwargs):
 
 
 
-@nago_access
+@nago_access()
 def set(token_or_hostname, **kwargs):
     """ Change the attributes of a connected node """
     node = nago.core.get_node(security_token) or {}
@@ -45,7 +45,7 @@ def set(token_or_hostname, **kwargs):
     node.save()
     return "Saved %s changes" % len(kwargs)
 
-@nago_access
+@nago_access()
 def connect(token_or_hostname=None):
     """ Connect to another node. By default connect to the masternode """
     if token_or_hostname is None:

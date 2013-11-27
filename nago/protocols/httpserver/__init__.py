@@ -66,7 +66,7 @@ def index():
         extensions[k]['description'] = v.__doc__
         extensions[k]['shortdesc'] = str(v.__doc__).splitlines()[0]
         extensions[k]['methods'] = {}
-        for name in nago.extensions.get_methods(k):
+        for name in nago.extensions.get_method_names(k):
             method = nago.extensions.get_method(k, name)
             extensions[k]['methods'][name] = {}
             extensions[k]['methods'][name]['description'] = method.__doc__
@@ -100,7 +100,7 @@ def list_extensions():
         result[k] = {}
         result[k]['description'] = v.__doc__
         result[k]['methods'] = {}
-        for name in nago.extensions.get_methods(k):
+        for name in nago.extensions.get_method_names(k):
             method = nago.extensions.get_method(k, name)
             result[k]['methods'][name] = {}
             result[k]['methods'][name]['description'] = method.__doc__

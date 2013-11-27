@@ -6,8 +6,8 @@ import nago.core
 from nago.core import nago_access
 import nago.extensions.settings
 
-@nago_access
-def list(search="unsigned"):
+@nago_access(name='list')
+def list_nodes(search="unsigned"):
     """ List all connected nodes
     """
     nodes = nago.core.get_nodes()
@@ -27,7 +27,7 @@ def list(search="unsigned"):
                 result[token] = node
         return result
 
-@nago_access
+@nago_access()
 def sign(node=None):
     """ Sign a specific node to grant it access
 
@@ -39,7 +39,7 @@ def sign(node=None):
         raise Exception("Specify either 'all' your specify token/host_name of node to sign. ")
     if node == 'all':
         node = 'unsigned'
-    nodes = list(search=node)
+    nodes = list_nodes(search=node)
     result = {}
     for token, i in nodes:
         i['access'] = 'node'
@@ -47,8 +47,8 @@ def sign(node=None):
         result[token] = i
     return result
 
-@nago_access
-def set(token_or_hostname, **kwargs):
+@nago_access(name='set')
+def set_attribute(token_or_hostname, **kwargs):
     """ Change the attributes of a connected node """
     node = nago.core.get_node(security_token) or {}
     if not kwargs:
@@ -58,12 +58,21 @@ def set(token_or_hostname, **kwargs):
     node.save()
     return "Saved %s changes" % len(kwargs)
 
-@nago_access
-def connect(token_or_hostname=None):
-    """ Connect to another node. By default connect to the masternode """
-    if token_or_hostname is None:
-        token_or_hostname = nago.extensions.settings.get('server')
+@nago_access()
+def ping(token_or_hostname=None):
+    """ Send an echo request to a nago host.
+
+    Arguments:
+        token_or_host_name  -- The remote node to ping
+                            If node is not provided, simply return pong
+                            You can use the special nodenames "server" or "master"
+     """
+    if not token_or_hostname:
+        return "Pong!"
     node = nago.core.get_node(token_or_hostname)
+    if not node and token_or_hostname in ('master', 'server'):
+        token_or_hostname = nago.extensions.settings.get('server')
+        node = nago.core.get_node(token_or_hostname)
     if not node:
         try:
             address = socket.gethostbyname(token_or_hostname)
@@ -72,4 +81,5 @@ def connect(token_or_hostname=None):
             node['address'] = address
         except Exception:
             raise Exception("'%s' was not found in list of known hosts, and does not resolve to a valid address" % token_or_hostname)
-    node.send_command('test', 'connectivity')
+    return node.send_command('nodes', 'ping')
+
