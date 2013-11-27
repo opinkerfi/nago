@@ -1,6 +1,6 @@
 # setup.py ###
-from distutils.core import setup
-from setuptools import find_packages
+#from distutils.core import setup
+from setuptools import find_packages, setup
 import os
 
 
@@ -18,7 +18,7 @@ datadirs = ['nago/protocols/httpserver/templates/', 'etc/nago']
 for i in datadirs:
     for cur_dir, dirlist, filelist in os.walk(i):
         datafiles.append(("/" + cur_dir, filelist))
-        print cur_dir, filelist, dirlist
+
 
 
 if __name__ == "__main__":
@@ -41,5 +41,7 @@ if __name__ == "__main__":
         license='GPL',
         scripts=['scripts/nago'],
         packages=find_packages(),
-        data_files=datafiles,
+        include_package_data=True,
+        package_data={'nago/protocols/httpserver': ['nago/protocols/httpserver/templates/']},
+        #data_files=datafiles,
     )
