@@ -1,11 +1,24 @@
 # setup.py ###
 from distutils.core import setup
+from setuptools import find_packages
 import os
 
+
+from nago import get_version
+
 NAME = "nago"
-VERSION = '0.1'
-SHORT_DESC = "General purpose agent, mostly used with nagios" 
+VERSION = get_version()
+SHORT_DESC = "General purpose agent, mostly used with nagios"
 LONG_DESC = """ """
+
+datafiles = []
+
+datadirs = ['nago/protocols/httpserver/templates/', 'etc/nago']
+
+for i in datadirs:
+    for cur_dir, dirlist, filelist in os.walk(i):
+        datafiles.append(("/" + cur_dir, filelist))
+        print cur_dir, filelist, dirlist
 
 
 if __name__ == "__main__":
@@ -27,5 +40,6 @@ if __name__ == "__main__":
         url='http://github.com/opinkerfi/nago',
         license='GPL',
         scripts=['scripts/nago'],
-        packages=['nago','nago.extensions','nago.core','nago.settings','nago.protocols','nago.protocols.httpserver'],
+        packages=find_packages(),
+        data_files=datafiles,
     )
