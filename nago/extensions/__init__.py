@@ -87,19 +87,28 @@ def call_method(token, extension_name, method_name, json_data=None, *args, **kwa
         raise NagoError("%s.%s is not remotely accessable" % (extension_name, method_name))
 
     # Check the security token, check if we have access to this method
-    if token != __localaccess__:
-        node = get_node(token)
-        if node.get('access') != 'master' and node.get('access') != method.nago_access:
-            result = {}
-            result['status'] = 'error'
-            result['message'] = "security token '%s' is authorized %s.%s" % (token, extension_name, method_name)
-            return result
+    allow_access = False
+    node = get_node(token)
+    if token == __localaccess__:
+        allow_access = True
+    elif node.get('access') == 'master':
+        allow_access = True
+    elif node.get('access') in method.nago_access.split():
+        allow_access = True
+    if allow_access is False:
+        result = {}
+        result['status'] = 'error'
+        result['message'] = "security token '%s' is not authorized to run %s.%s" % (token, extension_name, method_name)
+        result['access_required'] = method.nago_access
+        result['current_access'] = node.get('access')
+        return result
 
     if json_data:
         kwargs = kwargs.copy()
         data = json.loads(json_data)
         for k,v in data.items():
             kwargs[k] = v
+
     return method(*args, **kwargs)
 
 

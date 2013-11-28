@@ -14,6 +14,7 @@ from flask import Flask, request, session, g, redirect, url_for, abort, render_t
 from functools import wraps
 import nago.core
 import nago.extensions
+import json
 
 
 
@@ -54,9 +55,20 @@ def check_token():
 @app.route('/403', methods=['GET', 'POST'])
 def http403():
     token = session.get('token')
-    node = nago.core.get_node(token) or {}
+    node = nago.core.get_node(token)
+    if not node:
+        # Check if remote machine sent us their info
+        json_data = request.args.get('about_me', '{}')
+
+        # Log down remote node ip address
+        headers_list = request.headers.getlist("X-Forwarded-For")
+        user_ip = headers_list[0] if headers_list else request.remote_addr
+
+        node_info = json.loads(json_data)
+        node = nago.core.register_node(token, node_info=node_info, address=user_ip)
     host_name = node.get('host_name') or ''
-    return render_template('403.html', **locals())
+    return jsonify(token=token, message="Unauthorized access. This token is unsigned.", host_name=host_name)
+    #return render_template('403.html', **locals()), 403
 
 @app.route('/', methods=['GET', 'POST'])
 @login_required
@@ -123,6 +135,7 @@ def call_method(extension_name, method_name):
     for k, v in request.args.items():
         kwargs[k] = v
     kwargs.pop('token', None)
+    print kwargs.pop('about_me', None)
     kwargs.pop('json_data', None)
     token = session['token']
     result = {}

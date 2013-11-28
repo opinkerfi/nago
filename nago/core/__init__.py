@@ -6,6 +6,8 @@ import tempfile
 import ConfigParser
 import pwd
 
+import string
+import ConfigParser
 import json
 import requests
 import urllib
@@ -37,7 +39,7 @@ def log(message, level="info"):
         print("{level}: {message}".format(**locals()))
 
 
-def nago_access(access_type="master", name=None):
+def nago_access(access_required="master", name=None):
     """ Decorate other functions with this one to allow access
 
     Arguments:
@@ -49,7 +51,7 @@ def nago_access(access_type="master", name=None):
                        decorated.
     """
     def real_decorator(func):
-        func.nago_access = access_type
+        func.nago_access = access_required
         func.nago_name = name or func.__name__
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -91,11 +93,6 @@ def has_access(token):
     return False
 
 
-import os
-import string
-import ConfigParser
-
-
 def generate_token():
     """ Generate a new random security token.
 
@@ -109,6 +106,12 @@ def generate_token():
     stringset = string.ascii_letters + string.digits
     token = ''.join([stringset[i % len(stringset)] for i in [ord(x) for x in os.urandom(length)]])
     return token
+
+def register_node(token, node_info, **kwargs):
+        host_name = node_info.get('host_name', 'unknown')
+        node = nago.core.Node(token, host_name=host_name, **kwargs)
+        node.save()
+        return node
 
 
 class Node(object):
@@ -129,6 +132,19 @@ class Node(object):
     def __setitem__(self, item, value):
         self.data[item] = value
 
+    def delete(self):
+        """ Delete this node from config files """
+        cfg_file = "/etc/nago/nago.ini"
+        config = ConfigParser.ConfigParser()
+        config.read(cfg_file)
+        result = {}
+        token = self.data.pop("token", self.token)
+        if token not in config.sections():
+            raise Exception("Cannot find node in config. Delete aborted.")
+        config.remove_section(self.token)
+        with open(cfg_file, 'w') as f:
+            return config.write(f)
+
     def save(self):
         """ Save this node (and all its attributes) to config """
         cfg_file = "/etc/nago/nago.ini"
@@ -140,12 +156,13 @@ class Node(object):
             config.remove_section(self._original_token)
             config.add_section(token)
 
-        if token in config.sections():
-            for key, value in self.data.items():
-                config.set(token, key, value)
-            for key, value in config.items(token):
-                if key not in self.data:
-                    config.set(token, key, None)
+        if token not in config.sections():
+            config.add_section(token)
+        for key, value in self.data.items():
+            config.set(token, key, value)
+        for key, value in config.items(token):
+            if key not in self.data:
+                config.set(token, key, None)
         with open(cfg_file, 'w') as f:
             return config.write(f)
 
@@ -162,6 +179,7 @@ class Node(object):
         port = str(port)
         arguments = kwargs.copy()
         arguments['token'] = arguments.pop('token', self.token)
+        arguments['about_me'] = json.dumps(get_my_info())
 
         if not uri and not address:
             raise Exception("We need either a remote address or uri to connect to node")
@@ -174,8 +192,12 @@ class Node(object):
         uri += querystring
         log("Connecting to {uri}".format(**locals()), level="debug")
         try:
-            content = requests.get(uri).content
-            log(message="Successfully connected to %s" % uri, level="debug")
+            r = requests.get(uri)
+            content = r.content
+            if r.status_code == 200:
+                log(message="Successfully connected to %s" % uri, level="debug")
+            elif r.status_code == 403:
+                log(message="Access denied when connecting to %s" % uri, level="error")
             results = json.loads(content)
             return results
         except Exception, e:
