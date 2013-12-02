@@ -53,7 +53,7 @@ def call_extension(extension_name, *args):
     options.usage += "\n\nACTIONS\n=======\n"
     for action in available_commands:
         method = nago.extensions.get_method(extension_name, action)
-        help_text = method.__doc__
+        help_text = method.__doc__ or 'this method has no documentation'
         options.usage += "\n* %s():" % action
         options.usage += help_text + "\n"
 
