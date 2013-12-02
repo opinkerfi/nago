@@ -16,6 +16,7 @@ import platform
 import nago
 from functools import wraps
 from pynag.Parsers import mk_livestatus, config
+#import nago.extensions.info
 
 # List of log entries since program start. Format should be:
 # [{'timestamp':x, 'level': x, 'message'}]
@@ -35,8 +36,8 @@ def log(message, level="info"):
     entry['message'] = message
     entry['timestamp'] = now
     _log_entries.append(entry)
-    if level not in ('debug', 'info'):
-        print("{level}: {message}".format(**locals()))
+#    if level not in ('debug', 'info'):
+#        print("{level}: {message}".format(**locals()))
 
 
 def nago_access(access_required="master", name=None):
@@ -171,6 +172,21 @@ class Node(object):
 
     def __repr__(self):
         return self.data.__repr__()
+
+    def get_info(self, key=None):
+        """ Return all posted info about this node """
+        node_data = nago.extensions.info.node_data.get(self.token, {})
+        if key is None:
+            return node_data
+        else:
+            return node_data.get(key, {})
+
+    def update_info(self, key, value):
+        print "updating info", key, value
+        node_data = nago.extensions.info.node_data.get(self.token, {})
+        print node_data
+        node_data[key] = value
+        nago.extensions.info.node_data[self.token] = node_data
 
     def send_command(self, extension_name, method_name, **kwargs):
         uri = self.get('uri')
