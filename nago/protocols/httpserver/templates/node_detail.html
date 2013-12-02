@@ -1,0 +1,47 @@
+<html>
+<head>
+    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="http://pall.sigurdsson.is/css/style.css" />
+</head>
+<body>
+
+    <div id="main">
+        <div id="box" >
+            <div class="main_body"><div class="content"><div class=wrapper><div class="main_content">
+                <h1>Details for node {{ node.host_name }}</h1>
+                 {{ node.get_info().keys() }}
+
+                <div class="facts">
+                    <h2>facts</h2>
+                    <table class=table border=1 style="width: 100%; border-collapse:collapse; border: 0.5px solid grey;">
+                        <thead>
+                        <tr>
+                            <th>Fact Name</th>
+                            <th>Fact Value</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for fact, value in node.get_info().get("facts", {}).items() %}
+                        <tr>
+                            <td>{{fact}}</td>
+                            <td>{{value}}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                        </table>
+                </div>
+
+                {% for key, data in node.get_info().items() %}
+                    <div class="type_of_data">
+                        <h2>{{ key }}</h2>
+                        <div class="data">
+                            {{ data }}
+                        </div>
+                        <hr>
+                    </div>
+
+                {% endfor %}
+            </div></div></div></div>
+        </div>
+</body>
+</html>

@@ -91,6 +91,29 @@ def index():
             extensions[k]['methods'][name]['description'] = method.__doc__
     return render_template('index.html', **locals())
 
+@app.route('/nodes/', methods=['GET'])
+@login_required
+def list_nodes():
+    """ Return a list of all nodes """
+    token = session.get('token')
+    node = nago.core.get_node(token)
+    if not node.get('access') == 'master':
+        return jsonify(status='error', error="You need master access to view this page")
+
+    nodes = nago.core.get_nodes().values()
+    return render_template('nodes.html', **locals())
+
+@app.route('/nodes/<node_name>/', methods=['GET'])
+@login_required
+def view_node(node_name):
+    """ View one specific node """
+    token = session.get('token')
+    node = nago.core.get_node(token)
+    if not node.get('access') == 'master':
+        return jsonify(status='error', error="You need master access to view this page")
+
+    node = nago.core.get_node(node_name)
+    return render_template('node_detail.html', node=node)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

@@ -1,0 +1,35 @@
+<html>
+<head>
+  <link rel="stylesheet" href="http://pall.sigurdsson.is/css/style.css" />
+</head>
+<body>
+
+    <div id="main">
+        <div id="box" >
+            <div class="main_body"><div class="content"><div class=wrapper><div class="main_content">
+                <h1>List of Nodes</h1>
+                <table class=table border=1 style="width: 100%; border-collapse:collapse; border: 0.5px solid grey;">
+                    <thead>
+                        <tr>
+                            <th>Node Name</th>
+                            <th>Address</th>
+                            <th>Access</th>
+                            <th>token</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for node in nodes %}
+
+                    <tr>
+                        <td>{{ node.host_name }}</td>
+                        <td>{{ node.address }}</td>
+                        <td>{{ node.access }}</td>
+                        <td>{{ node.token }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div></div></div></div>
+        </div>
+</body>
+</html>
