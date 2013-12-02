@@ -1,9 +1,3 @@
-from nago.core import nago_access, get_node
-import nago.core
-import inspect
-import os
-import json
-
 """ Extensions module for Nago
 
 All actual domain and check-specific logic of Nago should live as an extension.
@@ -13,6 +7,14 @@ made available to the message bus.
 
 Take a look at facts.py for an example of a simple extension.
 """
+
+from nago.core import nago_access, get_node
+import nago.core
+import inspect
+import os
+import json
+import time
+
 
 __localaccess__ = object()  # If you are working locally on this machine, you can proof it with this
 __loaded_extensions = {}    # Extensions are loaded here with the load() method
@@ -103,12 +105,19 @@ def call_method(token, extension_name, method_name, json_data=None, *args, **kwa
         result['current_access'] = node.get('access')
         return result
 
+    # If a special argument called json_data, we decode the json and treat it
+    # As json encoded arguments
     if json_data:
-        kwargs = kwargs.copy()
         data = json.loads(json_data)
         for k,v in data.items():
             kwargs[k] = v
+    if 'about_me' in kwargs:
+        about_me = kwargs.pop('about_me')
+        node.update_info('node_info', about_me)
 
+    # Log when node last connected
+    now = time.time()
+    node.update_info('last_connect', now)
     return method(*args, **kwargs)
 
 
