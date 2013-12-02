@@ -7,8 +7,9 @@ from nago.core import nago_access
 import nago.protocols.httpserver
 import nago.extensions.settings
 import unittest
+from collections import defaultdict
 
-node_data = {}
+node_data = defaultdict(dict)
 
 @nago_access()
 def get_info(node_name=None, key=None):
@@ -21,10 +22,15 @@ def get_info(node_name=None, key=None):
     else:
         return data.get(key)
 
-
-
 @nago_access()
-def post(node_name, key, data):
+def get_all():
+    """ Return all information about all nodes """
+    return node_data
+
+
+
+@nago_access(access_required="node")
+def post(node_name, key, data, **kwargs):
     """ Give the server information about this node
 
     Arguments:
@@ -34,9 +40,29 @@ def post(node_name, key, data):
 
     """
     node = node_data.get(node_name, {})
-    node[key] = data
-    node_data[node_name] = node
+    token = node.token
+    node_data[token][key] = data
+    for k, v in kwargs.items():
+        node_data[token[k]] = v
     return "thanks!"
+
+@nago_access()
+def send(node_name):
+    """ Send our information to a remote nago instance
+
+    Arguments:
+        node -- node_name or token for the node this data belongs to
+    """
+    my_data = nago.core.get_my_info()
+    if not node_name:
+        node_name = nago.extensions.settings.get('server')
+    node = nago.core.get_node(node_name)
+    print node_name, my_data
+    for k, v in my_data.items():
+        nago.core.log("sending %s to %s" % (k, node['host_name']), level="notice")
+        kwargs = {'k': v}
+        node.send_command('info', 'post', node_name=node_name, **kwargs)
+    return "Data sent"
 
 
 def on_load():
