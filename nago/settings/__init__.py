@@ -69,6 +69,16 @@ def set_option(section='main', cfg_file=cfg_file, **kwargs):
         parser.write(f)
     return "Done"
 
+
+def get_section(section_name, cfg_file=cfg_file):
+    """ Returns a dictionary of an entire section """
+    parser = get_parser(cfg_file=cfg_file)
+    options = parser.options(section_name)
+    result = {}
+    for option in options:
+        result[option] = parser.get(section=section_name, option=option)
+    return result
+
 def _mkdir_for_config(cfg_file=cfg_file):
     """ Given a path to a filename, make sure the directory exists """
     dirname, filename = os.path.split(cfg_file)
