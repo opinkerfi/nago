@@ -9,7 +9,21 @@
         <div id="box" >
             <div class="main_body"><div class="content"><div class=wrapper><div class="main_content">
                 <h1>Details for node {{ node.host_name }}</h1>
-                 {{ node.get_info().keys() }}
+                 ...
+                {% for i in node.get_info().keys() %}
+                    <a href="{{ url_for("call_method", extension_name="info", method_name="get") }}?security_token={{node.token}}&key={{i}}">{{ i }}</a>,
+                {% endfor %}
+
+                {% for key, data in node.get_info().items() %}
+                    <div class="type_of_data">
+                        <h2>{{ key }}</h2>
+                        <div class="data">
+                            {{ data }}
+                        </div>
+                        <hr>
+                    </div>
+
+                {% endfor %}
 
                 <div class="facts">
                     <h2>facts</h2>
@@ -31,16 +45,6 @@
                         </table>
                 </div>
 
-                {% for key, data in node.get_info().items() %}
-                    <div class="type_of_data">
-                        <h2>{{ key }}</h2>
-                        <div class="data">
-                            {{ data }}
-                        </div>
-                        <hr>
-                    </div>
-
-                {% endfor %}
             </div></div></div></div>
         </div>
 </body>

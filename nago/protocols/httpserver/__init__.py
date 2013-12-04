@@ -105,7 +105,7 @@ def list_nodes():
 
 @app.route('/nodes/<node_name>/', methods=['GET'])
 @login_required
-def view_node(node_name):
+def node_detail(node_name):
     """ View one specific node """
     token = session.get('token')
     node = nago.core.get_node(token)

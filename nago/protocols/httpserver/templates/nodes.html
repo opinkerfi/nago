@@ -14,17 +14,23 @@
                             <th>Node Name</th>
                             <th>Address</th>
                             <th>Access</th>
-                            <th>token</th>
+                            <th>Last Connect</th>
+                            <th>Data</th>
                         </tr>
                     </thead>
                     <tbody>
                     {% for node in nodes %}
 
                     <tr>
-                        <td>{{ node.host_name }}</td>
+                        <td><a href="{{ url_for("node_detail", node_name=node.host_name )}}">{{ node.host_name }}</a></td>
                         <td>{{ node.address }}</td>
-                        <td>{{ node.access }}</td>
-                        <td>{{ node.token }}</td>
+                        <td>{{ node.access }} </td>
+                        <td>{{ node.get_info("last_connect") or "" }}</td>
+                        <td>
+                            {% for i in node.get_info().keys() %}
+                                <a href="{{ url_for("call_method", extension_name="info", method_name="get") }}?security_token={{node.token}}&key={{i}}">{{ i }}</a>,
+                            {% endfor %}
+                        </td>
                     </tr>
                     {% endfor %}
                     </tbody>
