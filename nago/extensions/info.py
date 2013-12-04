@@ -63,7 +63,7 @@ def send(node_name):
     for k, v in my_data.items():
         nago.core.log("sending %s to %s" % (k, node['host_name']), level="notice")
         json_params[k] = v
-    return node.send_command('info', 'post', node_name=node_name, key="node_info", json_parameters=json_params)
+    return node.send_command('info', 'post', node_name=node.token, key="node_info", **my_data)
 
 def on_load():
     my_info = nago.core.get_my_info()
