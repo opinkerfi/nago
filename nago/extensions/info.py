@@ -12,11 +12,11 @@ from collections import defaultdict
 node_data = defaultdict(dict)
 
 @nago_access()
-def get_info(node_name=None, key=None):
+def get(security_token=None, key=None):
     """ Get information about this node """
-    if node_name is None:
-        node_name = nago.core.get_my_info()['host_name']
-    data = node_data.get(node_name, {})
+    if security_token is None:
+        security_token = nago.core.get_my_info()['host_name']
+    data = node_data.get(security_token, {})
     if not key:
         return data
     else:
