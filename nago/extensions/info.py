@@ -30,20 +30,20 @@ def get_all():
 
 
 @nago_access(access_required="node")
-def post(node_name, key, data, **kwargs):
+def post(node_name, key, **kwargs):
     """ Give the server information about this node
 
     Arguments:
         node -- node_name or token for the node this data belongs to
         key  -- identifiable key, that you use later to retrieve that piece of data
-        data -- the data you need to store
-
+        kwargs -- the data you need to store
     """
-    node = node_data.get(node_name, {})
+    node = nago.core.get_node(node_name)
+    if not node:
+        raise ValueError("Node named %s not found" % node_name)
     token = node.token
-    node_data[token][key] = data
-    for k, v in kwargs.items():
-        node_data[token[k]] = v
+    node_data[token] = node_data[token] or {}
+    node_data[token][key] = kwargs
     return "thanks!"
 
 @nago_access()
@@ -57,13 +57,13 @@ def send(node_name):
     if not node_name:
         node_name = nago.extensions.settings.get('server')
     node = nago.core.get_node(node_name)
-    print node_name, my_data
+    json_params = {}
+    json_params['node_name'] = node_name
+    json_params['key'] = "node_info"
     for k, v in my_data.items():
         nago.core.log("sending %s to %s" % (k, node['host_name']), level="notice")
-        kwargs = {'k': v}
-        node.send_command('info', 'post', node_name=node_name, **kwargs)
-    return "Data sent"
-
+        json_params[k] = v
+    return node.send_command('info', 'post', node_name=node_name, key="node_info", json_parameters=json_params)
 
 def on_load():
     my_info = nago.core.get_my_info()
