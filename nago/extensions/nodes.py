@@ -4,7 +4,7 @@
 
 import nago.core
 from nago.core import nago_access
-import nago.extensions.settings
+import nago.settings
 import socket
 
 @nago_access(name='list')
@@ -110,7 +110,7 @@ def ping(token_or_hostname=None):
         return "Pong!"
     node = nago.core.get_node(token_or_hostname)
     if not node and token_or_hostname in ('master', 'server'):
-        token_or_hostname = nago.extensions.settings.get('server')
+        token_or_hostname = nago.settings.get_option('server')
         node = nago.core.get_node(token_or_hostname)
     if not node:
         try:
@@ -119,7 +119,7 @@ def ping(token_or_hostname=None):
             node['host_name'] = token_or_hostname
             node['address'] = address
             node['access'] = 'node'
-            if token_or_hostname == nago.extensions.settings.get('server'):
+            if token_or_hostname == nago.settings.get_option('server'):
                 node['access'] = 'master'
             node.save()
         except Exception:
@@ -130,7 +130,7 @@ def ping(token_or_hostname=None):
 def connect(remote_host):
     """ Connect to remote host and show our status """
     if remote_host in ('master', 'server'):
-        remote_host = nago.extensions.settings.get('server')
+        remote_host = nago.settings.get_option('server')
     node = nago.core.get_node(remote_host)
     if not node:
         try:
@@ -139,7 +139,7 @@ def connect(remote_host):
             node['host_name'] = remote_host
             node['address'] = address
             node['access'] = 'node'
-            if token_or_hostname == nago.extensions.settings.get('server'):
+            if token_or_hostname == nago.settings.get_option('server'):
                 node['access'] = 'master'
             node.save()
         except Exception:

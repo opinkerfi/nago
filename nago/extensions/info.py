@@ -5,7 +5,7 @@
 import nago.core
 from nago.core import nago_access
 import nago.protocols.httpserver
-import nago.extensions.settings
+import nago.settings
 import unittest
 from collections import defaultdict
 
@@ -55,7 +55,7 @@ def send(node_name):
     """
     my_data = nago.core.get_my_info()
     if not node_name:
-        node_name = nago.extensions.settings.get('server')
+        node_name = nago.settings.get('server')
     node = nago.core.get_node(node_name)
     json_params = {}
     json_params['node_name'] = node_name
