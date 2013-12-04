@@ -16,6 +16,8 @@ import platform
 import nago
 from functools import wraps
 from pynag.Parsers import mk_livestatus, config
+import socket
+
 #import nago.extensions.info
 
 # List of log entries since program start. Format should be:
@@ -182,20 +184,22 @@ class Node(object):
             return node_data.get(key, {})
 
     def update_info(self, key, value):
-        print "updating info", key, value
         node_data = nago.extensions.info.node_data.get(self.token, {})
-        print node_data
         node_data[key] = value
         nago.extensions.info.node_data[self.token] = node_data
 
     def send_command(self, extension_name, method_name, **kwargs):
         uri = self.get('uri')
         address = self.get('address')
+        host_name = self.get('host_name')
         port = self.get('port') or 5000
         port = str(port)
         arguments = kwargs.copy()
         arguments['token'] = arguments.pop('token', self.token)
         arguments['about_me'] = json.dumps(get_my_info())
+
+        if host_name and not address:
+            address = socket.gethostbyname(host_name)
 
         if not uri and not address:
             raise Exception("We need either a remote address or uri to connect to node")
