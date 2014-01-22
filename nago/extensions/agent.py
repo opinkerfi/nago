@@ -14,11 +14,11 @@ import nago.protocols.httpserver
 import unittest
 
 @nago_access()
-def start(debug=False):
+def start(debug=False, host='127.0.0.1'):
     """ starts a nago agent (daemon) process """
     if debug:
         debug = True
-    nago.protocols.httpserver.app.run(debug=debug)
+    nago.protocols.httpserver.app.run(debug=debug, host=host)
 
 
 @nago_access()
