@@ -51,6 +51,8 @@ def get_defaults():
 
 def get_parser(cfg_file=cfg_file):
     """ Returns a ConfigParser.ConfigParser() object for our cfg_file """
+    if not os.path.exists(cfg_file):
+        generate_configfile(cfg_file=cfg_file, defaults=defaults)
     config = ConfigParser.ConfigParser()
     config.read(cfg_file)
     return config
