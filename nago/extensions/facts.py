@@ -65,14 +65,3 @@ def send(remote_host=None):
     result['message'] = "sent %s facts to remote node '%s'" % (len(my_facts), remote_node.get('host_name'))
     return result
 
-
-
-
-if __name__ == '__main__':
-    my_facts = get_facts()
-    post_facts("123", my_facts)
-
-    print facts
-
-
-
