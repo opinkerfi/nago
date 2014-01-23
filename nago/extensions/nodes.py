@@ -13,19 +13,19 @@ def list_nodes(search="unsigned"):
     """
     nodes = nago.core.get_nodes()
     if search == "all":
-        return nodes
+        return map(lambda x: {x[0]: x[1].data}, nodes.items())
     elif search == 'unsigned':
         result = {}
         for token, node in nodes.items():
             if node.get('access') is None:
-                result[token] = node
+                result[token] = node.data
         return result
     else:
         result = {}
         for token, node in nodes.items():
             host_name = node.get('host_name')
             if search in (token, host_name):
-                result[token] = node
+                result[token] = node.data
         return result
 
 @nago_access()
@@ -89,7 +89,7 @@ def sign(node=None):
 @nago_access(name='set')
 def set_attribute(token_or_hostname, **kwargs):
     """ Change the attributes of a connected node """
-    node = nago.core.get_node(security_token) or {}
+    node = nago.core.get_node(token_or_hostname) or {}
     if not kwargs:
         return "No changes made"
     for k, v in kwargs.items():
